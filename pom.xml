@@ -24,6 +24,7 @@
         <module>eureka_client</module>
         <module>gateway_server</module>
         <module>routing_lib</module>
+        <module>ms_user</module>
     </modules>
 
     <properties>

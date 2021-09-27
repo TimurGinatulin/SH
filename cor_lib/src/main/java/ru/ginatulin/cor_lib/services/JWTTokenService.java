@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class JWTTokenService implements ITokenService {
@@ -29,7 +28,7 @@ public class JWTTokenService implements ITokenService {
                 .claim("sub", user.getUserEmail())
                 .claim("roles", user.getRole())
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.ES512, JWT_SECRET)
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                 .compact();
         return "Bearer " + compactTokenString;
     }
@@ -43,7 +42,7 @@ public class JWTTokenService implements ITokenService {
         String id = jwsClaims.getBody().get("id", String.class);
         List<String> roles = jwsClaims.getBody().get("roles", List.class);
         return UserInfo.builder()
-                .id(UUID.fromString(id))
+                .id(id)
                 .userEmail(email)
                 .role(roles)
                 .build();
