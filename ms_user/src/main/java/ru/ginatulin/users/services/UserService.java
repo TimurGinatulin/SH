@@ -54,7 +54,7 @@ public class UserService {
                 .role(roles)
                 .build();
         String token = iTokenService.generateToken(userInfo);
-        return new AuthResponseDto(user.getId().toString(), token);
+        return new AuthResponseDto(user.getId(), token);
     }
 
     public UserDto getUserById(String id) {

@@ -25,6 +25,7 @@
         <module>gateway_server</module>
         <module>routing_lib</module>
         <module>ms_user</module>
+        <module>ms_group</module>
     </modules>
 
     <properties>
