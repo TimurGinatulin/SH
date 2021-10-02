@@ -1,6 +1,6 @@
 spring:
   application:
-    name: user-ms
+    name: group-ms
   cloud:
     config:
       enabled: true
