@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.ginatulin.group.models.observers.AbstractComponentObservers;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "adjuster_table")
-public class Adjuster implements ComponentInt {
+public class Adjuster extends AbstractComponentObservers implements ComponentInt {
     @Id
     @Column(name = "id")
     @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
@@ -26,7 +27,7 @@ public class Adjuster implements ComponentInt {
     @Column(name = "title")
     private String title;
     @Column(name = "condition_ad")
-    private String condition;
+    private String variable;
     @CreationTimestamp
     @Column(name = "time_stamp")
     private LocalDateTime timeStamp;
@@ -36,13 +37,10 @@ public class Adjuster implements ComponentInt {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Override
-    public String getVariable() {
-        return condition;
-    }
 
     @Override
     public void setVariable(String variable) {
-        condition = variable;
+        this.variable = variable;
+        notify(variable);
     }
 }

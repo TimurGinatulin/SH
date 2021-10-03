@@ -13,19 +13,29 @@ import java.util.List;
 public class GroupController {
     @Autowired
     private GroupService service;
+
     @GetMapping
-    public List<Group> getAll(){
+    public List<GroupDto> getAll() {
         return service.getAll();
     }
+
     @GetMapping("/{ip}")
-    public List<GroupDto> getByIp(@PathVariable String ip){
+    public List<GroupDto> getByIp(@PathVariable String ip) {
         return service.getByIp(ip);
     }
+
     @PostMapping
-    public GroupDto createGroup(@RequestBody GroupDto dto){
+    public GroupDto createGroup(@RequestBody GroupDto dto) {
         return service.saveGroup(dto);
     }
 
-    // TODO: 01.10.2021 updateGroup
-    // TODO: 01.10.2021 deleteGroup
+    @PutMapping
+    public GroupDto updateGroup(@RequestBody GroupDto dto) {
+        return service.updateGroup(dto);
+    }
+
+    @DeleteMapping
+    public GroupDto deleteGroup(@PathVariable String ip) {
+        return service.deleteGroup(ip);
+    }
 }

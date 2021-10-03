@@ -9,15 +9,6 @@ public class AdjusterDto implements ComponentDtoInt {
 
     private String id;
     private String title;
-    private String condition;
+    private String variable;
 
-    @Override
-    public String getVariable() {
-        return condition;
-    }
-
-    @Override
-    public void setVariable(String variable) {
-        this.condition = variable;
-    }
 }
