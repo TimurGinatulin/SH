@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.ginatulin.group.models.observers.AbstractComponentObservers;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sensor_table")
-public class Sensor implements ComponentInt{
+public class Sensor extends AbstractComponentObservers implements ComponentInt {
     @Id
     @Column(name = "id")
     @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
@@ -35,4 +36,10 @@ public class Sensor implements ComponentInt{
     private LocalDateTime updatedAt;
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public void setVariable(String variable) {
+        this.variable = variable;
+        notify(variable);
+    }
+
 }

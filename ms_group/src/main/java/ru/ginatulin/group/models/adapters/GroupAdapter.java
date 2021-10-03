@@ -22,7 +22,7 @@ public class GroupAdapter {
         dto.setAdjusters(new ArrayList<>());
         entity.getAdjusters()
                 .forEach(adjuster -> dto.getAdjusters()
-                        .add(new AdjusterDto(adjuster.getId(), adjuster.getTitle(), adjuster.getCondition())));
+                        .add(new AdjusterDto(adjuster.getId(), adjuster.getTitle(), adjuster.getVariable())));
         return dto;
     }
 
@@ -42,7 +42,7 @@ public class GroupAdapter {
         dto.getAdjusters().forEach(adjusterDto -> entity.getAdjusters().add(Adjuster.builder()
                 .id(adjusterDto.getId())
                 .title(adjusterDto.getTitle())
-                .condition(adjusterDto.getCondition())
+                .variable(adjusterDto.getVariable())
                 .build()));
         return entity;
     }
