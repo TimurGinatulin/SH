@@ -26,7 +26,7 @@ public class UserController {
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(@RequestHeader("Authorization") String token) {
-        // TODO: 26.09.2021 Crete logout with redis
+        service.logout(token);
     }
 
     @PostMapping("/login")

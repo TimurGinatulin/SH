@@ -2,7 +2,6 @@ package ru.ginatulin.group.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.ginatulin.group.models.Group;
 import ru.ginatulin.group.services.GroupService;
 import ru.ginatulin.riuting_lib.dto.GroupDto;
 

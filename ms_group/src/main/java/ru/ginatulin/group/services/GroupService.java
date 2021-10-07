@@ -14,6 +14,7 @@ import ru.ginatulin.riuting_lib.dto.GroupDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,8 @@ public class GroupService {
     }
 
     public List<GroupDto> getByIp(String ip) {
-        grouprepository.findById(ip).orElseThrow(() -> new NotFoundException("Group with ip: " + ip + " not found"));
-        return null;
+        Group group = grouprepository.findById(ip).orElseThrow(() -> new NotFoundException("Group with ip: " + ip + " not found"));
+        return Collections.singletonList(GroupAdapter.castToDto(group));
     }
 
     public GroupDto saveGroup(GroupDto dto) {

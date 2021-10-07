@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.ginatulin.cor_lib.exception.models.Forbidden;
 import ru.ginatulin.cor_lib.exception.models.NotFoundException;
 import ru.ginatulin.cor_lib.interfacces.ITokenService;
+import ru.ginatulin.cor_lib.models.TokenRedis;
 import ru.ginatulin.cor_lib.models.UserInfo;
+import ru.ginatulin.cor_lib.services.RedisService;
 import ru.ginatulin.riuting_lib.dto.AuthRequestDto;
 import ru.ginatulin.riuting_lib.dto.AuthResponseDto;
 import ru.ginatulin.riuting_lib.dto.SignUpRequestDto;
@@ -31,6 +33,8 @@ public class UserService {
     private ITokenService iTokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RedisService redisService;
 
     public User createUSer(SignUpRequestDto signUpRequestDto) {
         User user = new User(signUpRequestDto);
@@ -54,6 +58,10 @@ public class UserService {
                 .role(roles)
                 .build();
         String token = iTokenService.generateToken(userInfo);
+        redisService.saveToken(TokenRedis.builder()
+                .id(token.replace("Bearer ", ""))
+                .condition(true)
+                .build());
         return new AuthResponseDto(user.getId(), token);
     }
 
@@ -96,5 +104,9 @@ public class UserService {
                     entity.getRoles().add(newRole);
             });
         }
+    }
+
+    public void logout(String token) {
+        redisService.update(token.replace("Bearer ", ""),false);
     }
 }
