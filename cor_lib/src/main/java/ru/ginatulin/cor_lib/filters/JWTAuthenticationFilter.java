@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.ginatulin.cor_lib.interfacces.ITokenService;
 import ru.ginatulin.cor_lib.models.UserInfo;
+import ru.ginatulin.cor_lib.services.RedisService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final ITokenService tokenService;
+    private final RedisService redisService;
 
     @Override
     @SneakyThrows
@@ -34,7 +36,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
         UsernamePasswordAuthenticationToken authenticationToken = createToken(authorizationHeader);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
     private UsernamePasswordAuthenticationToken createToken(String authorizationHeader) {
@@ -42,11 +44,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         UserInfo userInfo = tokenService.parseToken(token);
         List<GrantedAuthority> authorities = new ArrayList<>();
         if (userInfo.getRole() != null && !userInfo.getRole().isEmpty())
-            userInfo.getRole().forEach(role-> authorities.add(new SimpleGrantedAuthority(role)));
-    return new UsernamePasswordAuthenticationToken(userInfo,null,authorities);
+            userInfo.getRole().forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+        return new UsernamePasswordAuthenticationToken(userInfo, null, authorities);
     }
 
     private boolean authorizationHeaderIsInvalid(String authorizationHeader) {
-        return authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
+        return authorizationHeader == null ||
+                !authorizationHeader.startsWith("Bearer ") ||
+                !redisService.checkTokenInRedis(authorizationHeader.replace("Bearer ", ""));
     }
 }
