@@ -26,6 +26,7 @@
         <module>routing_lib</module>
         <module>ms_user</module>
         <module>ms_group</module>
+        <module>front_server</module>
     </modules>
 
     <properties>
