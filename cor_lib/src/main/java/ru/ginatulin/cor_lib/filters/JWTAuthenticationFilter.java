@@ -51,6 +51,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private boolean authorizationHeaderIsInvalid(String authorizationHeader) {
         return authorizationHeader == null ||
                 !authorizationHeader.startsWith("Bearer ") ||
-                !redisService.checkTokenInRedis(authorizationHeader.replace("Bearer ", ""));
+                redisService.checkTokenInRedis(authorizationHeader.replace("Bearer ", ""));
     }
 }
