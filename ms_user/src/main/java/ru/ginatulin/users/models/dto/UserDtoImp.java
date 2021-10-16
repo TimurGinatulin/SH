@@ -8,7 +8,6 @@ import ru.ginatulin.users.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor

@@ -21,6 +21,7 @@ import ru.ginatulin.users.repositories.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -36,6 +37,8 @@ public class UserService {
     private RedisService redisService;
 
     public User createUSer(SignUpRequestDto signUpRequestDto) {
+        if (!checkUserRequestCorrectly(signUpRequestDto))
+            throw new IllegalArgumentException();
         User user = new User(signUpRequestDto);
         Role role = rolesRepository.findByTitle(RoleEnums.USER.name())
                 .orElseThrow(() -> new NotFoundException("Role not found"));
@@ -44,12 +47,15 @@ public class UserService {
     }
 
     public AuthResponseDto login(AuthRequestDto request) {
+        if (checkPassword(request.getPassword()) || checkEmail(request.getEmail()))
+            throw new IllegalArgumentException();
         User user = userRepository.findByEmail(request.getEmail())
                 .orElse(null);
         if (user != null)
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
                 throw new Forbidden("Bad credentials");
         List<String> roles = new ArrayList<>();
+        assert user != null;
         user.getRoles().forEach(role -> roles.add(role.getTitle()));
         UserInfo userInfo = UserInfo.builder()
                 .id(user.getId())
@@ -77,6 +83,8 @@ public class UserService {
     }
 
     public UserDto updateUser(UserDto userDto) {
+        if (!checkUserDtoCorrectly(userDto))
+            throw new IllegalArgumentException();
         User user = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new NotFoundException("User with id: " + userDto.getId() + " not found"));
         updateUser(user, userDto);
@@ -92,16 +100,41 @@ public class UserService {
         if (dto.getTelegramId() != null)
             entity.setTelegramId(dto.getTelegramId());
         if (dto.getRoles() != null) {
-            dto.getRoles().forEach(role -> {
-                Role newRole = rolesRepository.findByTitle(role)
-                        .orElse(null);
-                if (newRole != null)
-                    entity.getRoles().add(newRole);
-            });
+            dto.getRoles().forEach(role ->
+                    rolesRepository.findByTitle(role).ifPresent(newRole -> entity.getRoles().add(newRole)));
         }
     }
 
     public void logout(String token) {
         redisService.saveToken(token.replace("Bearer ", ""));
+    }
+
+    private boolean checkUserRequestCorrectly(SignUpRequestDto requestDto) {
+        return checkEmail(requestDto.getEmail()) &&
+                checkPhone(requestDto.getPhone()) &&
+                checkPassword(requestDto.getPassword());
+    }
+
+    private boolean checkUserDtoCorrectly(UserDto requestDto) {
+        return checkEmail(requestDto.getEmail()) &&
+                checkPhone(requestDto.getPhone());
+    }
+
+    private boolean checkEmail(String email) {
+        String regex = "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(email).find();
+    }
+
+    private boolean checkPhone(String phone) {
+        String regex = "^\\+7-\\(+\\d{3}+\\)-+\\d{3}+-+\\d{2}+-\\d{2}$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(phone).find();
+    }
+
+    private boolean checkPassword(String password) {
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(password).find();
     }
 }

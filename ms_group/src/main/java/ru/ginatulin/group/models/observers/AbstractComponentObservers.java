@@ -13,7 +13,8 @@ public class AbstractComponentObservers {
     public void detach(Observer observer) {
         observers.remove(observer);
     }
-    public String getTitle(){
+
+    public String getTitle() {
         return null;
     }
 

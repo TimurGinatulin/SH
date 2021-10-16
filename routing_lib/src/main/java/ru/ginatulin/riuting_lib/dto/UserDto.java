@@ -17,4 +17,12 @@ public class UserDto {
     private String telegramId;
     private String phone;
     private List<String> roles;
+
+    public SignUpRequestDto castToRequest() {
+        return SignUpRequestDto.builder()
+                .email(this.email)
+                .phone(this.phone)
+                .telegramId(this.telegramId)
+                .build();
+    }
 }
