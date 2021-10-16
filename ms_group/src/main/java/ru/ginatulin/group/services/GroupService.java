@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +35,16 @@ public class GroupService {
     }
 
     public List<GroupDto> getByIp(String ip) {
-        Group group = grouprepository.findById(ip).orElseThrow(() -> new NotFoundException("Group with ip: " + ip + " not found"));
-        return Collections.singletonList(GroupAdapter.castToDto(group));
+        if (checkIp(ip)) {
+            Group group = grouprepository.findById(ip).orElseThrow(() -> new NotFoundException("Group with ip: " + ip + " not found"));
+            return Collections.singletonList(GroupAdapter.castToDto(group));
+        } else
+            throw new IllegalArgumentException();
     }
 
     public GroupDto saveGroup(GroupDto dto) {
+        if (!checkIp(dto.getIp()))
+            throw new IllegalArgumentException();
         Group save = GroupAdapter.castToEntity(dto);
         save.setAdjusters(new ArrayList<>());
         save.setSensors(new ArrayList<>());
@@ -56,6 +63,8 @@ public class GroupService {
     }
 
     public GroupDto updateGroup(GroupDto dto) {
+        if (!checkIp(dto.getIp()))
+            throw new IllegalArgumentException();
         Group group = grouprepository.findById(
                 dto.getIp()).orElseThrow(() -> new NotFoundException("Group with ip: " + dto.getIp() + " not found"));
         ComponentDisplay display = new ComponentDisplay();
@@ -93,9 +102,31 @@ public class GroupService {
     }
 
     public GroupDto deleteGroup(String ip) {
+        if (!checkIp(ip))
+            throw new IllegalArgumentException();
         Group group = grouprepository.findById(ip)
                 .orElseThrow(() -> new NotFoundException("group with ip: " + ip + " , not found"));
         group.setDeletedAt(LocalDateTime.now());
         return GroupAdapter.castToDto(grouprepository.save(group));
+    }
+
+    private boolean checkIp(String ip) {
+        String regex = "^\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(ip);
+        if (matcher.find()) {
+            String[] split = ip.split("\\.");
+            for (String s : split) {
+                try {
+                    int num = Integer.parseInt(s);
+                    if (num > 255)
+                        return false;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }
